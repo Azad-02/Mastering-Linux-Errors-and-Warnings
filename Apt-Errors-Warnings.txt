@@ -85,7 +85,7 @@ Installing a package from an external repository in Ubuntu consists of three ste
    Ubuntu doesn’t want you to add all the signature keys in the single /etc/apt/trusted.gpg file. It suggests using a separate file that are located in 
    the /etc/apt/trusted.gpg.d directory.
 
-SOLUTION:
+SOLUTION - 01:
 
 1. This means that instead of using the apt-key in this fashion:
 > curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | sudo apt-key add -
@@ -95,6 +95,31 @@ You should use it like this:
 
 Which is basically adding the key to its dedicated file under /etc/apt/trusted.d directory. Ubuntu won’t complain anymore.
 
+SOLUTION - 02:
+
+1. Export the GPG key from the deprecated keyring and store it in /usr/share/keyrings.
+> sudo apt-key list                 # list apt-keys
+
+2. Find the key giving warnings to export 
+          sudo apt-key export BE1229CF | sudo gpg --dearmour -o /usr/share/keyrings/microsoft.gpg
+Note: The BE1229CF value comes from the last 8 characters of the pub code
+
+3. Update our apt source file for the repository (e.g., /etc/apt/sources.list.d/microsoft.list), adding a signed-by tag:
+> deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge/ stable main
+
+4. Update apt to confirm the message is gone
+> sudo apt update
+
+5. Remove the original signature
+> sudo apt-key del BE1229CF
+
+SOLUTION - 03:
+
+1. Change directory to apt
+> cd /etc/apt
+
+2. Copy the content of trusted.gpg to trusted.gpg.d directory
+> sudo cp trusted.gpg trusted.gpg.d
 
 
 
