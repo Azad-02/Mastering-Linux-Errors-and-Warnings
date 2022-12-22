@@ -1,0 +1,76 @@
+-->  Warning: apt-key is deprecated. Manage key-ring files in trusted.gpg.d instead (see apt-key(8))  <--
+
+
+
+- apt-keys are stored in /etc/apt/trusted.gpg.d
+
+
+THEORY :
+
+Installing a package from an external repository in Ubuntu consists of three steps:
+   - Adding the repository’s GPG key to the system
+   - Adding the external repository to the system
+   - Installing the package from this external repository
+   
+- ‘apt-key being deprecated’ warning is when you try installing packages from third-party repositories.
+- It’s a warning, not an error. It doesn’t stop the process. The GPG key is added to your system and you can continue adding the external repository.
+
+-> Understanding the apt-key deprecation and trusted.gpg issue
+
+   There are two parts to this message:
+   	- apt-key is deprecated
+   	- Manage keyring files in trusted.gpg.d
+
+   When you add the keys (.gpg or .asc) of a repository, your system trusts the packages (signed with that key) coming from the repository. If you 
+   don’t add the key of a repository, your system won’t allow installing packages from it.
+
+-> Problem with the way apt-key works
+
+   It works by adding the keys to the /etc/apt/trusted.gpg file. The apt package manager trusts the keys inside this file.
+
+-> Ubuntu/Debian Linux wants you to separate GPG keys
+   
+   Ubuntu doesn’t want you to add all the signature keys in the single /etc/apt/trusted.gpg file. It suggests using a separate file that are located in 
+   the /etc/apt/trusted.gpg.d directory.
+
+
+
+SOLUTION - 01:
+
+1. This means that instead of using the apt-key in this fashion:
+> curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | sudo apt-key add -
+
+You should use it like this:
+> curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/spotify.gpg
+
+Which is basically adding the key to its dedicated file under /etc/apt/trusted.d directory. Ubuntu won’t complain anymore.
+
+
+
+SOLUTION - 02:
+
+1. Export the GPG key from the deprecated keyring and store it in /usr/share/keyrings.
+> sudo apt-key list                 # list apt-keys
+
+2. Find the key giving warnings to export 
+          sudo apt-key export BE1229CF | sudo gpg --dearmour -o /usr/share/keyrings/microsoft.gpg
+Note: The BE1229CF value comes from the last 8 characters of the pub code
+
+3. Update our apt source file for the repository (e.g., /etc/apt/sources.list.d/microsoft.list), adding a signed-by tag:
+> deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge/ stable main
+
+4. Update apt to confirm the message is gone
+> sudo apt update
+
+5. Remove the original signature
+> sudo apt-key del BE1229CF
+
+
+
+SOLUTION - 03:
+
+1. Change directory to apt
+> cd /etc/apt
+
+2. Copy the content of trusted.gpg to trusted.gpg.d directory
+> sudo cp trusted.gpg trusted.gpg.d
