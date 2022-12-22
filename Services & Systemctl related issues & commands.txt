@@ -1,0 +1,29 @@
+-->  Failed to start mongod.service: Unit mongod.service not found.  <--
+
+
+
+> sudo systemctl daemon-reload
+
+- Recent versions of Linux tend to use systemd (which uses the 'systemctl' command), 
+  while older versions of Linux tend to use System V init (which uses the 'service' command).
+
+- To check which init system your platform uses, run
+> ps --no-headers -o comm 1
+
+- systemd - select the systemd (systemctl)
+- init    - select the System V Init (service)
+
+
+- systemctl
+> sudo systemctl start mongod
+> sudo systemctl status mongod
+> sudo systemctl enable mongod (Optional)
+> sudo systemctl stop mongod
+> sudo systemctl restart mongod
+
+
+- service
+> sudo service mongod start
+> sudo service mongod status
+> sudo service mongod stop
+> sudo service mongod restart
