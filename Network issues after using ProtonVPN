@@ -1,0 +1,12 @@
+Wifi shows active connection to a network but Internet doesn't work neither in browser nor in Command Line.
+
+This issue generally occurs due to ipv6leak-protection of protonvpn.
+
+Solution:
+
+nmcli device                  # shows active network connections in device, if it shows pvpn-ipv6leak-protection or pvpn-killswitch, use commands
+
+nmcli connection delete pvpn-killswitch
+nmcli connection delete pvpn-ipv6leak-protection
+
+> Internet is back
