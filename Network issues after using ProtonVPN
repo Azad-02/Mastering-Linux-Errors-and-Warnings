@@ -9,4 +9,3 @@ nmcli device                  # shows active network connections in device, if i
 nmcli connection delete pvpn-killswitch
 nmcli connection delete pvpn-ipv6leak-protection
 
-> Internet is back
